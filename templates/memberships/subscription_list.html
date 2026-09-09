@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Active Subscriptions{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Member Subscriptions</h4>
+        <p class="text-muted small mb-0">Track plan assignments, expiry dates, and remaining days</p>
+    </div>
+    {% if not user.is_member %}
+    <a href="{% url 'memberships:subscription_create' %}" class="btn btn-primary fw-bold shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i>Assign Subscription
+    </a>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Member</th>
+                        <th>Plan Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Remaining Days</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in page_obj %}
+                    <tr>
+                        <td class="ps-4 fw-semibold">
+                            <a href="{% url 'members:detail' sub.member.pk %}" class="text-dark text-decoration-none">
+                                {{ sub.member.full_name }} ({{ sub.member.member_id }})
+                            </a>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">{{ sub.membership_plan.name }}</span></td>
+                        <td>{{ sub.start_date }}</td>
+                        <td>{{ sub.end_date }}</td>
+                        <td>
+                            {% if sub.status == 'ACTIVE' %}
+                                {% if sub.is_expiring_soon %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>{{ sub.remaining_days }} Days Left</span>
+                                {% else %}
+                                <span class="badge bg-success">{{ sub.remaining_days }} Days</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">0 Days</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">₹{{ sub.final_amount }}</td>
+                        <td>
+                            <span class="badge {% if sub.status == 'ACTIVE' %}bg-success{% elif sub.status == 'EXPIRED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ sub.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'payments:create' %}?member_id={{ sub.member.pk }}&sub_id={{ sub.pk }}" class="btn btn-sm btn-outline-success"><i class="bi bi-cash"></i> Record Payment</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center py-4 text-muted">No subscriptions found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

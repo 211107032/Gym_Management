@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Progress Tracking{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Body Measurements & Fitness Progress</h4>
+        <p class="text-muted small mb-0">Track weight evolution, BMI calculations, and body measurements over time</p>
+    </div>
+    {% if not user.is_member and members_list %}
+    <form method="GET" class="d-flex gap-2">
+        <select name="member_id" class="form-select" onchange="this.form.submit()">
+            {% for m in members_list %}
+            <option value="{{ m.id }}" {% if member and member.id == m.id %}selected{% endif %}>{{ m.full_name }} ({{ m.member_id }})</option>
+            {% endfor %}
+        </select>
+    </form>
+    {% endif %}
+</div>
+
+{% if member %}
+<!-- Chart & Log Row -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Weight & BMI Evolution ({{ member.full_name }})</h6>
+            <div style="height: 300px;">
+                <canvas id="progressGraph"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Entry Form -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle-fill text-success me-2"></i>Log New Measurement</h6>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-2">
+                    <div class="col-12" style="display: none;">
+                        {{ form.member }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Date</label>
+                        {{ form.date }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Weight (kg)</label>
+                        {{ form.weight }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Height (cm)</label>
+                        {{ form.height }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Body Fat %</label>
+                        {{ form.body_fat_percentage }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Chest (in)</label>
+                        {{ form.chest }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Waist (in)</label>
+                        {{ form.waist }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Notes</label>
+                        {{ form.notes }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold mt-3 shadow-sm">Save Measurement</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Log History Table -->
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-0 py-3 fw-bold"><i class="bi bi-clock-history text-info me-2"></i>Measurement History Logs</div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Date</th>
+                    <th>Weight (kg)</th>
+                    <th>Height (cm)</th>
+                    <th>BMI</th>
+                    <th>Body Fat %</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in progress_records %}
+                <tr>
+                    <td class="ps-4 fw-semibold">{{ r.date }}</td>
+                    <td class="fw-bold text-success">{{ r.weight }} kg</td>
+                    <td>{{ r.height }} cm</td>
+                    <td><span class="badge bg-light text-dark border">{{ r.bmi|default:"-" }}</span></td>
+                    <td>{{ r.body_fat_percentage|default:"-" }}%</td>
+                    <td class="small text-muted">{{ r.notes|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-4 text-muted">No progress records logged yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("{% url 'workouts:chart_data' member.id %}")
+        .then(res => res.json())
+        .then(data => {
+            new Chart(document.getElementById('progressGraph'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Weight (kg)',
+                            data: data.weights,
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'BMI',
+                            data: data.bmis,
+                            borderColor: '#06b6d4',
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        });
+});
+</script>
+{% else %}
+<div class="text-center py-5 text-muted">Please select a member to view progress records.</div>
+{% endif %}
+{% endblock %}

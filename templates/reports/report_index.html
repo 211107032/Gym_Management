@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Reports & Export Center</h4>
+        <p class="text-muted small mb-0">Generate comprehensive business reports and export data to CSV</p>
+    </div>
+</div>
+
+<!-- Executive Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Total Members</span>
+            <h3 class="fw-bold mb-0 mt-1">{{ total_members }}</h3>
+            <small class="text-success"><i class="bi bi-person-check me-1"></i>{{ active_members }} Active</small>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Total Gross Revenue</span>
+            <h3 class="fw-bold mb-0 mt-1 text-success">₹{{ total_revenue }}</h3>
+            <small class="text-muted">Current Month: ₹{{ monthly_revenue }}</small>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Expired Members</span>
+            <h3 class="fw-bold mb-0 mt-1 text-danger">{{ expired_members }}</h3>
+            <small class="text-muted">Requires Renewal</small>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Most Popular Plan</span>
+            <h4 class="fw-bold mb-0 mt-1 text-primary">{% if plan_stats %}{{ plan_stats.0.name }}{% else %}Standard{% endif %}</h4>
+        </div>
+    </div>
+</div>
+
+<!-- CSV Export Downloads -->
+<h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-spreadsheet-fill text-success me-2"></i>Export Reports to CSV</h5>
+<div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100">
+            <i class="bi bi-people-fill text-primary fs-1 mb-2"></i>
+            <h6 class="fw-bold">Member Master Report</h6>
+            <p class="text-muted small">Export complete list of members, statuses, and phone numbers</p>
+            <a href="{% url 'reports:export_csv' 'members' %}" class="btn btn-outline-primary fw-bold mt-auto"><i class="bi bi-download me-1"></i>Export Members CSV</a>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100">
+            <i class="bi bi-cash-stack text-success fs-1 mb-2"></i>
+            <h6 class="fw-bold">Financial Payments Report</h6>
+            <p class="text-muted small">Export all revenue transaction logs and payment methods</p>
+            <a href="{% url 'reports:export_csv' 'payments' %}" class="btn btn-outline-success fw-bold mt-auto"><i class="bi bi-download me-1"></i>Export Payments CSV</a>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100">
+            <i class="bi bi-calendar-check-fill text-info fs-1 mb-2"></i>
+            <h6 class="fw-bold">Daily Attendance Report</h6>
+            <p class="text-muted small">Export daily check-in and check-out attendance records</p>
+            <a href="{% url 'reports:export_csv' 'attendance' %}" class="btn btn-outline-info fw-bold mt-auto"><i class="bi bi-download me-1"></i>Export Attendance CSV</a>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100">
+            <i class="bi bi-card-checklist text-warning fs-1 mb-2"></i>
+            <h6 class="fw-bold">Subscriptions Report</h6>
+            <p class="text-muted small">Export active/expired membership subscriptions</p>
+            <a href="{% url 'reports:export_csv' 'subscriptions' %}" class="btn btn-outline-warning fw-bold mt-auto"><i class="bi bi-download me-1"></i>Export Subscriptions CSV</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

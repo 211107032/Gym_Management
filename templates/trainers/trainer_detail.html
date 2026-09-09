@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Trainer - {{ trainer.full_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">{{ trainer.full_name }} ({{ trainer.trainer_id }})</h4>
+        <p class="text-muted small mb-0">{{ trainer.specialization }} | Joined {{ trainer.joining_date }}</p>
+    </div>
+    {% if user.is_admin %}
+    <a href="{% url 'trainers:edit' trainer.pk %}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>Edit Trainer Profile</a>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Trainer Information</h5>
+            <ul class="list-group list-group-flush small">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Email:</span>
+                    <span class="fw-semibold">{{ trainer.email }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Phone:</span>
+                    <span class="fw-semibold">{{ trainer.phone }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Experience:</span>
+                    <span class="fw-semibold">{{ trainer.experience }} Years</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Qualification:</span>
+                    <span class="fw-semibold">{{ trainer.qualification }}</span>
+                </li>
+                {% if user.is_admin %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span class="text-muted">Salary:</span>
+                    <span class="fw-semibold text-success">₹{{ trainer.salary }}</span>
+                </li>
+                {% endif %}
+                <li class="list-group-item">
+                    <span class="text-muted d-block">Availability Shift:</span>
+                    <span class="fw-semibold">{{ trainer.availability }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0"><i class="bi bi-people text-info me-2"></i>Assigned Members ({{ assigned_memberships.count }})</h6>
+                {% if not user.is_member %}
+                <a href="{% url 'trainers:assign' %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Assign Member</a>
+                {% endif %}
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Member Name</th>
+                            <th>Assigned Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in assigned_memberships %}
+                        <tr>
+                            <td class="fw-bold text-primary">{{ a.member.member_id }}</td>
+                            <td class="fw-semibold">{{ a.member.full_name }}</td>
+                            <td>{{ a.assigned_date }}</td>
+                            <td>
+                                <a href="{% url 'members:detail' a.member.pk %}" class="btn btn-sm btn-light border"><i class="bi bi-eye"></i> Profile</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-muted text-center py-4">No members assigned to this trainer yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

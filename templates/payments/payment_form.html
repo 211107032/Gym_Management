@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-cash-coin text-success me-2"></i>{{ title }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Select Member</label>
+                                {{ form.member }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Associated Subscription Plan (Optional)</label>
+                                {{ form.subscription }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Amount Paid (₹)</label>
+                                {{ form.amount }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Payment Method</label>
+                                {{ form.payment_method }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Payment Date</label>
+                                {{ form.payment_date }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Transaction / Ref ID</label>
+                                {{ form.transaction_id }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Payment Status</label>
+                                {{ form.status }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Notes</label>
+                                {{ form.notes }}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'payments:list' %}" class="btn btn-light border">Cancel</a>
+                            <button type="submit" class="btn btn-success fw-bold px-4">Record Payment & Generate Receipt</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

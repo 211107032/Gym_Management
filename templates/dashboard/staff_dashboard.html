@@ -1,0 +1,90 @@
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Staff Workstation</h3>
+    <p class="text-muted small mb-0">Quick member check-in, registration, and payment entry</p>
+</div>
+
+<!-- Quick Action Buttons -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <a href="{% url 'members:create' %}" class="card border-0 shadow-sm rounded-4 text-center p-3 text-decoration-none bg-primary text-white h-100">
+            <i class="bi bi-person-plus-fill fs-1 mb-2"></i>
+            <span class="fw-bold">Register Member</span>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="{% url 'attendance:list' %}" class="card border-0 shadow-sm rounded-4 text-center p-3 text-decoration-none bg-success text-white h-100">
+            <i class="bi bi-calendar-check-fill fs-1 mb-2"></i>
+            <span class="fw-bold">Mark Attendance</span>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="{% url 'payments:create' %}" class="card border-0 shadow-sm rounded-4 text-center p-3 text-decoration-none bg-info text-dark h-100">
+            <i class="bi bi-cash-stack fs-1 mb-2"></i>
+            <span class="fw-bold">Record Payment</span>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="{% url 'members:list' %}" class="card border-0 shadow-sm rounded-4 text-center p-3 text-decoration-none bg-dark text-white h-100">
+            <i class="bi bi-search fs-1 mb-2"></i>
+            <span class="fw-bold">Search Member</span>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i>Today's Recent Check-ins</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in recent_checkins %}
+                        <tr>
+                            <td class="fw-semibold">{{ c.member.full_name }} ({{ c.member.member_id }})</td>
+                            <td>{{ c.check_in_time|time:"h:i A" }}</td>
+                            <td><span class="badge bg-success">{{ c.status }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center py-3">No check-ins yet today.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 fw-bold"><i class="bi bi-credit-card me-2 text-success"></i>Recent Payments</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Member</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in recent_payments %}
+                        <tr>
+                            <td><a href="{% url 'payments:receipt' p.pk %}" class="fw-bold text-primary">{{ p.payment_id }}</a></td>
+                            <td>{{ p.member.full_name }}</td>
+                            <td class="fw-bold">₹{{ p.amount }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center py-3">No payments recorded.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

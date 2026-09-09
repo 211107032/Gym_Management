@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Trainers Directory{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Gym Trainers & Coaches</h4>
+        <p class="text-muted small mb-0">Manage fitness trainers, specializations, and member assignments</p>
+    </div>
+    {% if user.is_admin %}
+    <div class="d-flex gap-2">
+        <a href="{% url 'trainers:assign' %}" class="btn btn-outline-primary shadow-sm"><i class="bi bi-person-check me-1"></i>Assign Member</a>
+        <a href="{% url 'trainers:create' %}" class="btn btn-primary fw-bold shadow-sm"><i class="bi bi-plus-lg me-1"></i>Add New Trainer</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    {% for trainer in page_obj %}
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-3">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4 me-3" style="width: 54px; height: 54px;">
+                            {{ trainer.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">{{ trainer.full_name }}</h5>
+                            <span class="badge bg-light text-primary border">{{ trainer.trainer_id }}</span>
+                        </div>
+                    </div>
+
+                    <p class="text-muted small mb-2"><i class="bi bi-award me-1 text-warning"></i><strong>Specialization:</strong> {{ trainer.specialization }}</p>
+                    <p class="text-muted small mb-2"><i class="bi bi-briefcase me-1"></i><strong>Experience:</strong> {{ trainer.experience }} Years</p>
+                    <p class="text-muted small mb-2"><i class="bi bi-mortarboard me-1"></i><strong>Qualification:</strong> {{ trainer.qualification }}</p>
+                    <p class="text-muted small mb-3"><i class="bi bi-telephone me-1"></i>{{ trainer.phone }}</p>
+                </div>
+
+                <div class="d-flex gap-2 mt-2">
+                    <a href="{% url 'trainers:detail' trainer.pk %}" class="btn btn-outline-primary w-100 fw-semibold">View Profile</a>
+                    {% if user.is_admin %}
+                    <a href="{% url 'trainers:edit' trainer.pk %}" class="btn btn-light border"><i class="bi bi-pencil"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5 text-muted">No trainers added yet.</div>
+    {% endfor %}
+</div>
+{% endblock %}

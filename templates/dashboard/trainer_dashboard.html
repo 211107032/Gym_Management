@@ -1,0 +1,70 @@
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h3 class="fw-bold mb-1">Trainer Dashboard</h3>
+        <p class="text-muted small mb-0">Assigned members, workout routines, and progress tracking</p>
+    </div>
+    <div>
+        <a href="{% url 'workouts:create' %}" class="btn btn-primary shadow-sm"><i class="bi bi-plus-lg me-1"></i>Create Workout Plan</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 fw-bold"><i class="bi bi-people-fill text-primary me-2"></i>My Assigned Members</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>ID</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in assigned_memberships %}
+                        <tr>
+                            <td class="fw-semibold">{{ a.member.full_name }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ a.member.member_id }}</span></td>
+                            <td>
+                                <a href="{% url 'members:detail' a.member.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> Profile</a>
+                                <a href="{% url 'workouts:progress' %}?member_id={{ a.member.pk }}" class="btn btn-sm btn-outline-success"><i class="bi bi-graph-up"></i> Progress</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center py-3">No members currently assigned to you.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 fw-bold"><i class="bi bi-journal-text text-info me-2"></i>Created Workout Plans</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Plan Name</th>
+                            <th>Member</th>
+                            <th>Goal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for wp in workout_plans %}
+                        <tr>
+                            <td><a href="{% url 'workouts:detail' wp.pk %}" class="fw-bold text-dark text-decoration-none">{{ wp.name }}</a></td>
+                            <td>{{ wp.member.full_name }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ wp.goal }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center py-3">No workout plans created yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

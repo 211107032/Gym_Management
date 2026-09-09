@@ -1,0 +1,126 @@
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Welcome back, {{ member.full_name|default:user.username }}!</h3>
+    <p class="text-muted small mb-0">Track your membership, workout routines, and fitness progress</p>
+</div>
+
+<!-- Member Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Membership Status</span>
+            <div class="mt-2">
+                {% if subscription %}
+                    <span class="badge badge-active fs-6 px-3 py-2">{{ subscription.membership_plan.name }}</span>
+                {% else %}
+                    <span class="badge bg-secondary fs-6">No Active Plan</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Subscription Expiry</span>
+            <h4 class="fw-bold mb-0 mt-1">{% if subscription %}{{ subscription.end_date }}{% else %}N/A{% endif %}</h4>
+            {% if subscription %}
+                <small class="{% if subscription.is_expiring_soon %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                    <i class="bi bi-clock me-1"></i>{{ subscription.remaining_days }} Days Remaining
+                </small>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Attendance Record</span>
+            <h4 class="fw-bold mb-0 mt-1">{{ attendance_pct }}%</h4>
+            <small class="text-success"><i class="bi bi-check-circle me-1"></i>Good Standing</small>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Assigned Trainer</span>
+            <h4 class="fw-bold mb-0 mt-1">{% if trainer_assign %}{{ trainer_assign.trainer.full_name }}{% else %}None{% endif %}</h4>
+            <small class="text-muted">{% if trainer_assign %}{{ trainer_assign.trainer.specialization }}{% else %}Self Guided{% endif %}</small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-journal-text text-primary me-2"></i>My Active Workout Plan</h6>
+            {% if workout_plan %}
+                <div class="bg-light p-3 rounded-3 mb-3">
+                    <h5 class="fw-bold text-dark mb-1">{{ workout_plan.name }}</h5>
+                    <p class="text-muted small mb-2">{{ workout_plan.description }}</p>
+                    <span class="badge bg-primary">Goal: {{ workout_plan.goal }}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Exercise</th>
+                                <th>Muscle</th>
+                                <th>Sets x Reps</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ex in workout_plan.exercises.all %}
+                            <tr>
+                                <td class="fw-semibold">{{ ex.exercise_name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ ex.muscle_group }}</span></td>
+                                <td>{{ ex.sets }} x {{ ex.repetitions }} ({{ ex.weight }}kg)</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-muted text-center py-2">No exercises listed yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">No workout plan assigned currently. Ask your trainer or staff!</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-graph-up text-success me-2"></i>Weight & BMI Progress</h6>
+            <div style="height: 250px;">
+                <canvas id="memberWeightChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if member %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("{% url 'workouts:chart_data' member.id %}")
+        .then(res => res.json())
+        .then(data => {
+            new Chart(document.getElementById('memberWeightChart'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Weight (kg)',
+                            data: data.weights,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true
+                        },
+                        {
+                            label: 'BMI',
+                            data: data.bmis,
+                            borderColor: '#06b6d4',
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        });
+});
+</script>
+{% endif %}

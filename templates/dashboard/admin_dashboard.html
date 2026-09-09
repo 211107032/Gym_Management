@@ -1,0 +1,242 @@
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h3 class="fw-bold mb-1">Admin Dashboard Overview</h3>
+        <p class="text-muted small mb-0">Real-time metrics, financial statistics, and attendance breakdown</p>
+    </div>
+    <div>
+        <a href="{% url 'reports:index' %}" class="btn btn-outline-primary shadow-sm"><i class="bi bi-file-earmark-bar-graph me-1"></i>View Full Reports</a>
+    </div>
+</div>
+
+<!-- Stat Cards Row -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Total Members</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_members }}</h3>
+                    <small class="text-success"><i class="bi bi-person-check-fill me-1"></i>{{ active_members }} Active</small>
+                </div>
+                <div class="stat-icon bg-purple-light">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Monthly Revenue</span>
+                    <h3 class="fw-bold mb-0 mt-1">₹{{ monthly_revenue }}</h3>
+                    <small class="text-muted"><i class="bi bi-clock-history me-1"></i>Pending: ₹{{ pending_payments }}</small>
+                </div>
+                <div class="stat-icon bg-emerald-light">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Today's Attendance</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ today_attendance_count }}</h3>
+                    <small class="text-info"><i class="bi bi-person-badge me-1"></i>Trainers: {{ total_trainers }}</small>
+                </div>
+                <div class="stat-icon bg-cyan-light">
+                    <i class="bi bi-calendar-check-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Expiring (7 Days)</span>
+                    <h3 class="fw-bold mb-0 mt-1 text-warning">{{ expiring_soon_count }}</h3>
+                    <small class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Expired: {{ expired_members }}</small>
+                </div>
+                <div class="stat-icon bg-amber-light">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-graph-up me-2 text-primary"></i>Member Growth Trend</h6>
+            <div style="height: 250px;">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-currency-rupee me-2 text-success"></i>Monthly Revenue Trend</h6>
+            <div style="height: 250px;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2 text-info"></i>Attendance Breakdown (Current Month)</h6>
+            <div style="height: 250px;">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart me-2 text-warning"></i>Popular Membership Plans</h6>
+            <div style="height: 250px;">
+                <canvas id="membershipChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity Tables -->
+<div class="row g-4">
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0">Recent Member Registrations</h6>
+                <a href="{% url 'members:list' %}" class="small text-decoration-none">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Member</th>
+                            <th>ID</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in recent_members %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'members:detail' m.pk %}" class="fw-semibold text-dark text-decoration-none">{{ m.full_name }}</a>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ m.member_id }}</span></td>
+                            <td><span class="badge bg-success">{{ m.status }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center">No recent members</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0">Recent Payment Transactions</h6>
+                <a href="{% url 'payments:list' %}" class="small text-decoration-none">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Member</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in recent_payments %}
+                        <tr>
+                            <td><a href="{% url 'payments:receipt' p.pk %}" class="fw-semibold text-primary">{{ p.payment_id }}</a></td>
+                            <td>{{ p.member.full_name }}</td>
+                            <td class="fw-bold">₹{{ p.amount }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ p.get_payment_method_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-muted text-center">No recent payments</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("{% url 'dashboard:analytics_api' %}")
+        .then(res => res.json())
+        .then(data => {
+            // Growth Chart
+            new Chart(document.getElementById('growthChart'), {
+                type: 'line',
+                data: {
+                    labels: data.growth.labels,
+                    datasets: [{
+                        label: 'New Members',
+                        data: data.growth.data,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Revenue Chart
+            new Chart(document.getElementById('revenueChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.revenue.labels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: data.revenue.data,
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Attendance Chart
+            new Chart(document.getElementById('attendanceChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.attendance.labels,
+                    datasets: [{
+                        data: data.attendance.data,
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Membership Chart
+            new Chart(document.getElementById('membershipChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.membership.labels,
+                    datasets: [{
+                        label: 'Active Subscriptions',
+                        data: data.membership.data,
+                        backgroundColor: '#06b6d4',
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        });
+});
+</script>

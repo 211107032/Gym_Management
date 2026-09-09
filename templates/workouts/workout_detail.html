@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Workout - {{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">{{ plan.name }}</h4>
+        <p class="text-muted small mb-0">Assigned to: <strong>{{ plan.member.full_name }}</strong> (ID: {{ plan.member.member_id }}) | Trainer: {{ plan.trainer.full_name|default:"Gym Staff" }}</p>
+    </div>
+    <span class="badge bg-primary fs-6 px-3 py-2">Goal: {{ plan.goal }}</span>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 fw-bold"><i class="bi bi-card-checklist text-primary me-2"></i>Exercise Routines</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Exercise</th>
+                            <th>Muscle Group</th>
+                            <th>Sets x Reps</th>
+                            <th>Weight / Rest</th>
+                            <th>Instructions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ex in exercises %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-dark">{{ ex.exercise_name }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ ex.muscle_group }}</span></td>
+                            <td>{{ ex.sets }} Sets x {{ ex.repetitions }} Reps</td>
+                            <td>{{ ex.weight }}kg / {{ ex.rest_time }}s</td>
+                            <td class="small text-muted">{{ ex.instructions|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-muted text-center py-4">No exercises added to this plan yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline Add Exercise Form (For Staff/Trainers) -->
+    {% if not user.is_member %}
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle text-success me-2"></i>Add Exercise to Plan</h6>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold">Exercise Name</label>
+                    {{ exercise_form.exercise_name }}
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold">Target Muscle Group</label>
+                    {{ exercise_form.muscle_group }}
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Sets</label>
+                        {{ exercise_form.sets }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Reps</label>
+                        {{ exercise_form.repetitions }}
+                    </div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Weight (kg)</label>
+                        {{ exercise_form.weight }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Rest (sec)</label>
+                        {{ exercise_form.rest_time }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Instructions</label>
+                    {{ exercise_form.instructions }}
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm">Add Exercise</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

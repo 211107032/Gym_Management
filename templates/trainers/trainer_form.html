@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-person-badge text-primary me-2"></i>{{ title }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <h6 class="fw-bold text-primary mb-0 mt-2">Trainer Account Credentials</h6>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Username</label>
+                                {{ form.username }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Password {% if trainer %}(Leave blank to keep existing){% endif %}</label>
+                                {{ form.password }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email Address</label>
+                                {{ form.email }}
+                            </div>
+
+                            <hr class="my-3">
+                            <h6 class="fw-bold text-primary mb-0">Professional Details</h6>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Specialization</label>
+                                {{ form.specialization }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Years of Experience</label>
+                                {{ form.experience }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Qualification / Certifications</label>
+                                {{ form.qualification }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Monthly Salary (₹)</label>
+                                {{ form.salary }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Phone Number</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Joining Date</label>
+                                {{ form.joining_date }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Shift Availability</label>
+                                {{ form.availability }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Profile Picture</label>
+                                {{ form.profile_picture }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'trainers:list' %}" class="btn btn-light border">Cancel</a>
+                            <button type="submit" class="btn btn-primary fw-bold px-4">Save Trainer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

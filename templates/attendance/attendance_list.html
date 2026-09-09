@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Daily Attendance Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Daily Attendance Log</h4>
+        <p class="text-muted small mb-0">Record member check-ins, check-outs, and monitor attendance metrics</p>
+    </div>
+</div>
+
+<!-- Stats Row for Selected Date -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Present</span>
+            <h3 class="fw-bold mb-0 mt-1 text-success">{{ present_count }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Late</span>
+            <h3 class="fw-bold mb-0 mt-1 text-warning">{{ late_count }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Absent / Unchecked</span>
+            <h3 class="fw-bold mb-0 mt-1 text-danger">{{ absent_count }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-muted small fw-semibold text-uppercase">Active Members</span>
+            <h3 class="fw-bold mb-0 mt-1 text-primary">{{ total_members }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Check-in Box & Date Selector -->
+<div class="row g-4 mb-4">
+    {% if not user.is_member %}
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+            <h6 class="fw-bold mb-2"><i class="bi bi-qr-code-scan text-primary me-2"></i>Quick Member Check-In</h6>
+            <form method="POST" action="{% url 'attendance:check_in' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    {{ check_in_form.member_identifier }}
+                    <button type="submit" class="btn btn-primary fw-bold px-4"><i class="bi bi-box-arrow-in-right me-1"></i>Check In</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+            <h6 class="fw-bold mb-2"><i class="bi bi-calendar-event text-info me-2"></i>Select Attendance Date</h6>
+            <form method="GET" class="d-flex gap-2">
+                <input type="date" name="date" class="form-control" value="{{ selected_date }}">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-search me-1"></i>Load</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Records Table -->
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Member ID</th>
+                        <th>Member Name</th>
+                        <th>Check-In Time</th>
+                        <th>Check-Out Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for att in page_obj %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary">{{ att.member.member_id }}</td>
+                        <td class="fw-semibold">{{ att.member.full_name }}</td>
+                        <td>{{ att.check_in_time|time:"h:i A"|default:"-" }}</td>
+                        <td>{{ att.check_out_time|time:"h:i A"|default:"-" }}</td>
+                        <td>
+                            <span class="badge {% if att.status == 'PRESENT' %}bg-success{% elif att.status == 'LATE' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ att.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if not att.check_out_time and not user.is_member %}
+                            <a href="{% url 'attendance:check_out' att.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Check Out</a>
+                            {% else %}
+                            <span class="text-muted small">Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No attendance logs recorded for {{ selected_date }}.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

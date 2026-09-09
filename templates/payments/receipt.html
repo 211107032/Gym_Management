@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Payment Receipt - {{ payment.payment_id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 btn-print-hide">
+        <a href="{% url 'payments:list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Payments</a>
+        <button onclick="window.print()" class="btn btn-primary fw-bold px-4 shadow-sm"><i class="bi bi-printer me-2"></i>Print Receipt</button>
+    </div>
+
+    <!-- Printable Receipt Box -->
+    <div class="card border border-2 rounded-4 shadow-sm p-4 p-md-5 bg-white receipt-box mx-auto" style="max-width: 700px;">
+        <div class="row align-items-center border-bottom pb-4 mb-4">
+            <div class="col-8">
+                <h3 class="fw-bold text-primary mb-1">{{ gym_info.name|default:"Apex Fitness & Gym" }}</h3>
+                <p class="text-muted small mb-0">{{ gym_info.address }}</p>
+                <p class="text-muted small mb-0">Phone: {{ gym_info.phone }} | Email: {{ gym_info.email }}</p>
+            </div>
+            <div class="col-4 text-end">
+                <span class="badge bg-success fs-6 px-3 py-2 text-uppercase mb-2 d-inline-block">{{ payment.get_status_display }}</span>
+                <div class="fw-bold text-secondary">RECEIPT</div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6">
+                <small class="text-uppercase text-muted fw-semibold">Payment ID</small>
+                <h5 class="fw-bold text-primary mb-0">{{ payment.payment_id }}</h5>
+            </div>
+            <div class="col-6 text-end">
+                <small class="text-uppercase text-muted fw-semibold">Payment Date</small>
+                <h6 class="fw-semibold mb-0">{{ payment.payment_date }}</h6>
+            </div>
+            <div class="col-6 mt-3">
+                <small class="text-uppercase text-muted fw-semibold">Billed To (Member)</small>
+                <h5 class="fw-bold text-dark mb-0">{{ payment.member.full_name }}</h5>
+                <p class="text-muted small mb-0">ID: {{ payment.member.member_id }} | Phone: {{ payment.member.phone }}</p>
+            </div>
+            <div class="col-6 text-end mt-3">
+                <small class="text-uppercase text-muted fw-semibold">Payment Method</small>
+                <h6 class="fw-semibold mb-0">{{ payment.get_payment_method_display }}</h6>
+                {% if payment.transaction_id %}
+                <small class="text-muted">Txn: {{ payment.transaction_id }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <table class="table table-bordered align-middle mb-4">
+            <thead class="bg-light">
+                <tr>
+                    <th>Description / Package</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="fw-bold">{% if payment.subscription %}{{ payment.subscription.membership_plan.name }}{% else %}Gym Membership Subscription{% endif %}</div>
+                        <small class="text-muted">
+                            {% if payment.subscription %}
+                            Valid from {{ payment.subscription.start_date }} to {{ payment.subscription.end_date }} ({{ payment.subscription.membership_plan.duration_days }} Days)
+                            {% else %}
+                            Gym Fitness Facility Payment
+                            {% endif %}
+                        </small>
+                    </td>
+                    <td class="text-end fw-bold fs-5">₹{{ payment.amount }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row align-items-center">
+            <div class="col-6">
+                <small class="text-muted d-block">Thank you for training with {{ gym_info.name|default:"Apex Fitness" }}!</small>
+                <small class="text-muted">Keep pushing your boundaries.</small>
+            </div>
+            <div class="col-6 text-end">
+                <small class="text-muted text-uppercase d-block mb-4">Authorized Signature</small>
+                <div class="border-top pt-2 d-inline-block px-4 text-muted small fw-semibold">Gym Management</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
