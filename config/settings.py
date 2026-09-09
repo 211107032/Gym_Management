@@ -95,12 +95,21 @@ if IS_VERCEL:
     if TMP_DB_PATH.exists():
         DB_PATH = TMP_DB_PATH
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{DB_PATH}",
+db_config = {}
+if os.getenv('DATABASE_URL', '').strip():
+    db_config = dj_database_url.config(
         conn_max_age=0 if IS_VERCEL else 600,
         conn_health_checks=True,
     )
+
+if not db_config or not db_config.get('ENGINE'):
+    db_config = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': str(DB_PATH),
+    }
+
+DATABASES = {
+    'default': db_config
 }
 
 AUTH_USER_MODEL = 'accounts.User'
