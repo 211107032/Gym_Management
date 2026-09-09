@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
@@ -81,10 +82,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
+IS_VERCEL = os.getenv('VERCEL') == '1' or 'VERCEL' in os.environ
+
+DB_PATH = BASE_DIR / 'db.sqlite3'
+if IS_VERCEL:
+    TMP_DB_PATH = Path('/tmp/db.sqlite3')
+    if not TMP_DB_PATH.exists() and DB_PATH.exists():
+        try:
+            shutil.copy2(DB_PATH, TMP_DB_PATH)
+        except Exception:
+            pass
+    if TMP_DB_PATH.exists():
+        DB_PATH = TMP_DB_PATH
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
+        default=f"sqlite:///{DB_PATH}",
+        conn_max_age=0 if IS_VERCEL else 600,
         conn_health_checks=True,
     )
 }
