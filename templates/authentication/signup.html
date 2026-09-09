@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-80 py-4">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Header Banner -->
+            <div class="card-header bg-dark text-white text-center py-4 border-0 position-relative">
+                <i class="bi bi-activity text-info fs-1 d-block mb-1"></i>
+                <h3 class="fw-bold mb-1">{{ gym_info.name|default:"Apex Fitness & Gym" }}</h3>
+                <p class="text-light opacity-75 small mb-3">Create your account to access your gym portal</p>
+                
+                <!-- Auth Toggle Tabs -->
+                <div class="d-flex justify-content-center">
+                    <div class="btn-group bg-secondary bg-opacity-25 p-1 rounded-pill" role="group">
+                        <a href="{% url 'accounts:signup' %}" class="btn btn-sm btn-info text-white fw-bold rounded-pill px-4">
+                            <i class="bi bi-person-plus-fill me-1"></i> Sign Up
+                        </a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-outline-light border-0 fw-bold rounded-pill px-4">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Body -->
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" action="{% url 'accounts:signup' %}" id="signupForm">
+                    {% csrf_token %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label for="id_first_name" class="form-label fw-semibold text-secondary small">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-6">
+                            <label for="id_last_name" class="form-label fw-semibold text-secondary small">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="id_username" class="form-label fw-semibold text-secondary small">Username *</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="id_email" class="form-label fw-semibold text-secondary small">Email Address *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="id_phone" class="form-label fw-semibold text-secondary small">Phone Number</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="id_role" class="form-label fw-semibold text-secondary small">Register As *</label>
+                            {{ form.role }}
+                            {% if form.role.errors %}<div class="text-danger small mt-1">{{ form.role.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <label for="id_password" class="form-label fw-semibold text-secondary small">Password *</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="id_confirm_password" class="form-label fw-semibold text-secondary small">Confirm Password *</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}<div class="text-danger small mt-1">{{ form.confirm_password.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm py-3 mb-3">
+                        <i class="bi bi-person-check-fill me-2"></i>Create Account & Sign In
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 pt-3 border-top">
+                    <p class="text-muted mb-1 small">Already have an account?</p>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark btn-sm rounded-pill px-4 fw-bold">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Sign In Here
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

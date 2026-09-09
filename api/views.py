@@ -14,8 +14,42 @@ from workouts.models import WorkoutPlan
 
 from .serializers import (
     MemberSerializer, MembershipPlanSerializer, MemberSubscriptionSerializer,
-    AttendanceSerializer, PaymentSerializer, TrainerSerializer, WorkoutPlanSerializer
+    AttendanceSerializer, PaymentSerializer, TrainerSerializer, WorkoutPlanSerializer,
+    RegisterSerializer, UserSerializer
 )
+
+class RegisterAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user.role == user.Role.MEMBER:
+                Member.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'phone': user.phone or '',
+                        'email': user.email or '',
+                        'joining_date': timezone.now().date(),
+                        'status': 'ACTIVE',
+                    }
+                )
+            elif user.role == user.Role.TRAINER:
+                Trainer.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'phone': user.phone or '',
+                        'email': user.email or '',
+                        'specialization': 'Fitness & Conditioning',
+                        'experience': 1,
+                        'qualification': 'Certified Trainer',
+                        'salary': 0.00,
+                        'joining_date': timezone.now().date(),
+                    }
+                )
+            return Response({'message': 'User registered successfully', 'user': UserSerializer(user).data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class IsAdminOrStaffPermission(permissions.BasePermission):
     def has_permission(self, request, view):

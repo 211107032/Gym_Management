@@ -5,11 +5,62 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
-from .forms import CustomLoginForm, UserProfileForm, UserManagementForm
+from django.utils import timezone
+from members.models import Member
+from trainers.models import Trainer
+from .forms import CustomLoginForm, UserProfileForm, UserManagementForm, CustomSignUpForm
 
 User = get_user_model()
 
+def signup_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard:index')
+
+    if request.method == 'POST':
+        form = CustomSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            password = form.cleaned_data.get('password')
+            user.set_password(password)
+            user.save()
+
+            # Auto-create profile based on role
+            if user.role == User.Role.MEMBER:
+                Member.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'phone': user.phone or '',
+                        'email': user.email or '',
+                        'joining_date': timezone.now().date(),
+                        'status': 'ACTIVE',
+                    }
+                )
+            elif user.role == User.Role.TRAINER:
+                Trainer.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'phone': user.phone or '',
+                        'email': user.email or '',
+                        'specialization': 'Fitness & Conditioning',
+                        'experience': 1,
+                        'qualification': 'Certified Trainer',
+                        'salary': 0.00,
+                        'joining_date': timezone.now().date(),
+                    }
+                )
+
+            login(request, user)
+            messages.success(request, f"Welcome to the Gym, {user.get_full_name_or_username()}! Your account has been created successfully.")
+            return redirect('dashboard:index')
+        else:
+            messages.error(request, "Please correct the registration errors below.")
+    else:
+        form = CustomSignUpForm()
+
+    return render(request, 'authentication/signup.html', {'form': form})
+
 def login_view(request):
+
     if request.user.is_authenticated:
         return redirect('dashboard:index')
     

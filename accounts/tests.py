@@ -23,3 +23,37 @@ class UserModelTests(TestCase):
         )
         self.assertTrue(admin.is_admin)
         self.assertTrue(admin.is_staff_user)
+
+    def test_signup_view_creates_user_and_member_profile(self):
+        response = self.client.post('/accounts/signup/', {
+            'username': 'newmember',
+            'first_name': 'New',
+            'last_name': 'User',
+            'email': 'newmember@example.com',
+            'phone': '1234567890',
+            'role': User.Role.MEMBER,
+            'password': 'password123',
+            'confirm_password': 'password123'
+        })
+        self.assertEqual(response.status_code, 302)
+        user = User.objects.get(username='newmember')
+        self.assertIsNotNone(user)
+        self.assertTrue(hasattr(user, 'member_profile'))
+        self.assertEqual(user.member_profile.status, 'ACTIVE')
+
+    def test_signup_view_creates_trainer_profile(self):
+        response = self.client.post('/accounts/signup/', {
+            'username': 'newtrainer',
+            'first_name': 'Trainer',
+            'last_name': 'One',
+            'email': 'newtrainer@example.com',
+            'phone': '9876543210',
+            'role': User.Role.TRAINER,
+            'password': 'password123',
+            'confirm_password': 'password123'
+        })
+        self.assertEqual(response.status_code, 302)
+        user = User.objects.get(username='newtrainer')
+        self.assertIsNotNone(user)
+        self.assertTrue(hasattr(user, 'trainer_profile'))
+

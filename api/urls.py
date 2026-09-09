@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     MemberViewSet, MembershipPlanViewSet, SubscriptionViewSet,
     AttendanceViewSet, PaymentViewSet, TrainerViewSet, WorkoutPlanViewSet,
-    DashboardStatsAPIView
+    DashboardStatsAPIView, RegisterAPIView
 )
 
 router = DefaultRouter()
@@ -19,6 +19,8 @@ router.register(r'workouts', WorkoutPlanViewSet, basename='workout')
 
 urlpatterns = [
     # Auth Endpoints
+    path('auth/signup/', RegisterAPIView.as_view(), name='api_signup'),
+    path('auth/register/', RegisterAPIView.as_view(), name='api_register'),
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair_alias'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
