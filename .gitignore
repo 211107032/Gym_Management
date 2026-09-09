@@ -35,9 +35,9 @@ env/
 .env
 .env.local
 
-# Database
-*.sqlite3
-*.db
+# Database (Included for Vercel deployment)
+# *.sqlite3
+# *.db
 
 # Media & Static collection
 media/
