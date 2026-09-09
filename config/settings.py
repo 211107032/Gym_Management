@@ -8,11 +8,11 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-gym-management-super-secret-key-change-in-production')
+SECRET_KEY = os.getenv('SECRET_KEY') or 'django-insecure-gym-management-super-secret-key-change-in-production'
 
-DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
+DEBUG = (os.getenv('DEBUG') or 'True').lower() in ('true', '1', 't')
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = (os.getenv('ALLOWED_HOSTS') or '*').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:8000,http://localhost:8000,https://*.vercel.app,https://*.now.sh').split(',') if origin.strip()
